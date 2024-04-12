@@ -1,5 +1,13 @@
+const author = { name: "Josue", lastname: "Lopez" };
+
+const formatPrice = (currency_id, price) => ({
+  currency: currency_id,
+  amount: Math.floor(price),
+  decimals: parseFloat((price % 1).toFixed(2)),
+});
+
 const formatSearchResults = (data) => {
-  let categories = [];
+  let categories = new Set();
   const items = data.results.map((item) => {
     const {
       category_id,
@@ -12,29 +20,51 @@ const formatSearchResults = (data) => {
       shipping,
     } = item;
 
-    if (!categories.includes(category_id)) {
-      categories.push(category_id);
-    }
+    categories.add(category_id);
+    const freeShipping = shipping ? shipping.free_shipping : false;
 
     return {
-      id: id,
-      title: title,
-      price: {
-        currency: currency_id,
-        amount: Math.floor(price),
-        decimals: parseFloat((price % 1).toFixed(2)),
-      },
+      id,
+      title,
+      price: formatPrice(currency_id, price),
       picture: thumbnail,
-      condition: condition,
-      free_shipping: shipping.free_shipping,
+      condition,
+      free_shipping: freeShipping,
     };
   });
 
   return {
-    author: { name: "Josue", lastname: "Lopez" },
-    categories,
+    author,
+    categories: Array.from(categories),
     items,
   };
 };
 
-export { formatSearchResults };
+const formatItemDetails = (itemData, itemDescription) => {
+  const { id, title, currency_id, price, pictures, condition, shipping } =
+    itemData;
+
+  const description =
+    itemDescription && itemDescription.plain_text
+      ? itemDescription.plain_text
+      : "";
+  const picture = pictures && pictures.length > 0 ? pictures[0].url : undefined;
+  const freeShipping = shipping ? shipping.free_shipping : false;
+
+  const item = {
+    id,
+    title,
+    price: formatPrice(currency_id, price),
+    picture,
+    condition,
+    free_shipping: freeShipping,
+    description,
+  };
+
+  return {
+    author,
+    item,
+  };
+};
+
+export { formatSearchResults, formatItemDetails };

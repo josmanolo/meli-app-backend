@@ -1,7 +1,7 @@
 export const errorHandler = (error, req, res, next) => {
     const { response, request, message, status } = error;
 
-    let errorResponse = {
+    const errorResponse = {
         success: false,
         message: "Internal server error",
         status: 500,

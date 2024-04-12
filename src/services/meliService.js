@@ -1,26 +1,27 @@
-import axios from "axios";
 import { formatSearchResults } from "../helpers/formatHelpers.js";
-import axiosInstace from "./apiConfig.js";
+import axiosInstance from "./apiConfig.js";
+
+const meliApiRequest = async (endpoint) => {
+    try {
+        const response = await axiosInstance.get(endpoint);
+        return response.data;
+    } catch (error) {
+        console.error('API request failed:', error);
+        throw error;
+    }
+}
 
 const searchMeliItems = async (query) => {
-  const url = `/sites/MLA/search?q=${query}`;
-  const response = await axiosInstace.get(url);
-
-  return formatSearchResults(response.data);
+    const data = await meliApiRequest(`/sites/MLA/search?q=${query}`);
+    return formatSearchResults(data);
 };
 
 const fetchItem = async (id) => {
-  const url = `/items/${id}`;
-  const response = await axios.get(url);
-
-  return response.data;
+    return await meliApiRequest(`/items/${id}`);
 };
 
 const fetchDescription = async (id) => {
-  const url = `/items/${id}/description`;
-  const response = await axios.get(url);
-
-  return response.data;
+    return await meliApiRequest(`/items/${id}/description`);
 };
 
 export { searchMeliItems, fetchItem, fetchDescription };

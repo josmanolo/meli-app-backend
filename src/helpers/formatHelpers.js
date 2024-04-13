@@ -70,8 +70,7 @@ const formatSearchResults = async (data) => {
   };
 };
 
-const formatItemDetails = (itemData, itemDescription) => {
-  console.log(itemData);
+const formatItemDetails = (itemData, itemDescription, category) => {
   const {
     id,
     title,
@@ -83,12 +82,15 @@ const formatItemDetails = (itemData, itemDescription) => {
     sold_quantity,
   } = itemData;
 
+  console.log(itemData)
+
   const description =
     itemDescription && itemDescription.plain_text
       ? itemDescription.plain_text
-      : "";
+      : "El producto no cuenta con descripción";
   const picture = pictures && pictures.length > 0 ? pictures[0].url : undefined;
   const freeShipping = shipping ? shipping.free_shipping : false;
+  const categories_path = category.path_from_root.map(category => category.name);
 
   const item = {
     id,
@@ -99,6 +101,7 @@ const formatItemDetails = (itemData, itemDescription) => {
     free_shipping: freeShipping,
     sold_quantity,
     description,
+    categories_path,
   };
 
   return {

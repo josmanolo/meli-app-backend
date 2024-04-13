@@ -3,6 +3,7 @@ import {
   fetchDescription,
   fetchItem,
   searchMeliItems,
+  fetchCategory,
 } from "../services/meliService.js";
 
 const searchItems = async (req, res, next) => {
@@ -22,12 +23,12 @@ const searchItems = async (req, res, next) => {
 
 const getItemDetails = async (req, res, next) => {
   const { id } = req.params;
-  console.log(id)
+
   try {
-    
     const item = await fetchItem(id);
     const description = await fetchDescription(id);
-    const formattedItem = formatItemDetails(item, description);
+    const category = await fetchCategory(item.category_id); 
+    const formattedItem = formatItemDetails(item, description, category);
 
     res.json(formattedItem);
   } catch (error) {

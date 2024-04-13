@@ -6,13 +6,14 @@ import {
 } from "../services/meliService.js";
 
 const searchItems = async (req, res, next) => {
-  const query = req.query.q;
+  const { q: query, limit } = req.query;
+
   if (!query) {
-    return res.status(400).json({ message: "Query parameter is required" });
+    return res.status(400).json({ message: "Search parameter is required" });
   }
 
   try {
-    const items = await searchMeliItems(query);
+    const items = await searchMeliItems(query, limit);
     res.json(items);
   } catch (error) {
     next(error);
@@ -21,8 +22,9 @@ const searchItems = async (req, res, next) => {
 
 const getItemDetails = async (req, res, next) => {
   const { id } = req.params;
-
+  console.log(id)
   try {
+    
     const item = await fetchItem(id);
     const description = await fetchDescription(id);
     const formattedItem = formatItemDetails(item, description);

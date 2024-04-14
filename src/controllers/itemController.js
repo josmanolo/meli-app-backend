@@ -25,9 +25,17 @@ const getItemDetails = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const item = await fetchItem(id);
-    const description = await fetchDescription(id);
-    const category = await fetchCategory(item.category_id); 
+    const itemPromise = fetchItem(id);
+    const descriptionPromise = fetchDescription(id);
+
+    const item = await itemPromise;
+    const categoryPromise = fetchCategory(item.category_id);
+
+    const [description, category] = await Promise.all([
+      descriptionPromise,
+      categoryPromise,
+    ]);
+
     const formattedItem = formatItemDetails(item, description, category);
 
     res.json(formattedItem);

@@ -17,6 +17,7 @@ const searchItems = async (req, res, next) => {
     const items = await searchMeliItems(query, limit);
     res.json(items);
   } catch (error) {
+    console.log(error)
     next(error);
   }
 };

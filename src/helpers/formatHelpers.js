@@ -1,8 +1,8 @@
-import { getCategoryNames } from "../services/meliService.js";
+import { getCategoryNames, getSellerInfo } from "../services/meliService.js";
 
 const author = { name: "Josue", lastname: "Lopez" };
 
-const formatItem = (item, categoryIds, categoryCount) => {
+const formatItem = (item, categoryIds, categoryCount, sellerCities) => {
   const {
     category_id,
     id,
@@ -12,12 +12,14 @@ const formatItem = (item, categoryIds, categoryCount) => {
     thumbnail,
     condition,
     shipping,
+    seller,
   } = item;
 
   categoryIds.add(category_id);
   categoryCount[category_id] = (categoryCount[category_id] || 0) + 1;
 
   const freeShipping = shipping ? shipping.free_shipping : false;
+  const city = sellerCities[seller.id];
 
   return {
     id,
@@ -26,13 +28,16 @@ const formatItem = (item, categoryIds, categoryCount) => {
     picture: thumbnail,
     condition,
     free_shipping: freeShipping,
+    city,
   };
 };
 
 const getMostFrequentCategoryId = (categoryCount) => {
-  return Object.keys(categoryCount).reduce((a, b) =>
-    categoryCount[a] > categoryCount[b] ? a : b
-  );
+  if (categoryCount.length > 0) {
+    return Object.keys(categoryCount).reduce((a, b) =>
+      categoryCount[a] > categoryCount[b] ? a : b
+    );
+  }
 };
 
 const getMostFrequentCategoryName = (categoryId, categoriesInfo) => {
@@ -51,9 +56,13 @@ const formatPrice = (currency_id, price) => ({
 const formatSearchResults = async (data) => {
   let categoryCount = {};
   let categoryIds = new Set();
-  const items = data.results.map((item) =>
-    formatItem(item, categoryIds, categoryCount)
-  );
+  let sellerIds = new Set(data.results.map((item) => item.seller.id));
+
+  const sellerCities = await getSellerInfo(Array.from(sellerIds));
+
+  const items = data.results.map((item) => {
+    return formatItem(item, categoryIds, categoryCount, sellerCities);
+  });
 
   const categoriesInfo = await getCategoryNames(Array.from(categoryIds));
   const mostFrequentCategoryId = getMostFrequentCategoryId(categoryCount);
@@ -82,15 +91,15 @@ const formatItemDetails = (itemData, itemDescription, category) => {
     sold_quantity,
   } = itemData;
 
-  console.log(itemData)
-
   const description =
     itemDescription && itemDescription.plain_text
       ? itemDescription.plain_text
       : "El producto no cuenta con descripción";
   const picture = pictures && pictures.length > 0 ? pictures[0].url : undefined;
   const freeShipping = shipping ? shipping.free_shipping : false;
-  const categories_path = category.path_from_root.map(category => category.name);
+  const categories_path = category.path_from_root.map(
+    (category) => category.name
+  );
 
   const item = {
     id,

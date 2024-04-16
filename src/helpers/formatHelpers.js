@@ -90,6 +90,7 @@ const formatItemDetails = (itemData, itemDescription, category) => {
     condition,
     shipping,
     sold_quantity,
+    initial_quantity,
   } = itemData;
 
   const description =
@@ -112,6 +113,7 @@ const formatItemDetails = (itemData, itemDescription, category) => {
     sold_quantity,
     description,
     categories_path,
+    initial_quantity,
   };
 
   return {

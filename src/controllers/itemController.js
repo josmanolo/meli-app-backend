@@ -1,3 +1,4 @@
+import { createApiError } from "../helpers/apiHelpers.js";
 import { formatItemDetails } from "../helpers/formatHelpers.js";
 import {
   fetchDescription,
@@ -28,35 +29,21 @@ const getItemDetails = async (req, res, next) => {
     const itemPromise = fetchItem(id);
     const descriptionPromise = fetchDescription(id);
 
-    const item = await itemPromise;
+    const [item, description] = await Promise.all([itemPromise, descriptionPromise]);
 
     if (item.error) {
-      const err = new Error(item.message);
-      err.status = item.status;
-      err.error = item.error;
-
+      const err = createApiError(item, "item");
       return next(err);
     }
-
-    const categoryPromise = fetchCategory(item.category_id);
-    const [description, category] = await Promise.all([
-      descriptionPromise,
-      categoryPromise,
-    ]);
-
     if (description.error) {
-      const err = new Error(description.message);
-      err.status = item.status;
-      err.error = item.error;
-
+      const err = createApiError(description, "description");
       return next(err);
     }
+
+    const category = await fetchCategory(item.category_id);
 
     if (category.error) {
-      const err = new Error(category.message);
-      err.status = item.status;
-      err.error = item.error;
-
+      const err = createApiError(category, "category");
       return next(err);
     }
 

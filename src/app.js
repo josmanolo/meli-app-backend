@@ -8,7 +8,7 @@ const app = express();
 app.use(compression());
 
 app.use(express.json());
-app.use('/api/items', itemsRouter);
+app.use("/api/items", itemsRouter);
 
 app.use(errorHandler);
 

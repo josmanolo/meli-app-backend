@@ -19,7 +19,7 @@ const formatItem = (item, categoryIds, categoryCount, sellerCities) => {
   categoryCount[category_id] = (categoryCount[category_id] || 0) + 1;
 
   const freeShipping = shipping ? shipping.free_shipping : false;
-  const city = sellerCities[seller.id];
+  const sellerCity = sellerCities.find((element) => element.id === seller.id);
 
   return {
     id,
@@ -28,7 +28,7 @@ const formatItem = (item, categoryIds, categoryCount, sellerCities) => {
     picture: thumbnail,
     condition,
     free_shipping: freeShipping,
-    city,
+    city: sellerCity.city,
   };
 };
 

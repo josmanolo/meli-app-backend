@@ -10,17 +10,20 @@ const meliApiRequest = async (endpoint) => {
     const response = await axiosInstance.get(endpoint);
     return response.data;
   } catch (error) {
-    console.error("API request failed:", error);
-    throw error;
+    return {
+      error: error.response?.data?.error,
+      message: error.response?.data?.message || "Unknown error",
+      status: error.response?.status || 500,
+    };
   }
 };
 
 const searchMeliItems = async (query, limit = 4) => {
-  const data = await meliApiRequest(
+  const response = await meliApiRequest(
     `/sites/MLA/search?q=${query}&limit=${limit}`
   );
 
-  return formatSearchResults(data);
+  return formatSearchResults(response);
 };
 
 const fetchItem = async (id) => {

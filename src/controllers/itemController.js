@@ -17,7 +17,6 @@ const searchItems = async (req, res, next) => {
     const items = await searchMeliItems(query, limit);
     res.json(items);
   } catch (error) {
-    console.log(error)
     next(error);
   }
 };
@@ -30,15 +29,38 @@ const getItemDetails = async (req, res, next) => {
     const descriptionPromise = fetchDescription(id);
 
     const item = await itemPromise;
-    const categoryPromise = fetchCategory(item.category_id);
 
+    if (item.error) {
+      const err = new Error(item.message);
+      err.status = item.status;
+      err.error = item.error;
+
+      return next(err);
+    }
+
+    const categoryPromise = fetchCategory(item.category_id);
     const [description, category] = await Promise.all([
       descriptionPromise,
       categoryPromise,
     ]);
 
-    const formattedItem = formatItemDetails(item, description, category);
+    if (description.error) {
+      const err = new Error(description.message);
+      err.status = item.status;
+      err.error = item.error;
 
+      return next(err);
+    }
+
+    if (category.error) {
+      const err = new Error(category.message);
+      err.status = item.status;
+      err.error = item.error;
+
+      return next(err);
+    }
+
+    const formattedItem = formatItemDetails(item, description, category);
     res.json(formattedItem);
   } catch (error) {
     next(error);

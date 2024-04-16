@@ -56,6 +56,7 @@ const formatPrice = (currency_id, price) => ({
 const formatSearchResults = async (data) => {
   let categoryCount = {};
   let categoryIds = new Set();
+
   let sellerIds = new Set(data.results.map((item) => item.seller.id));
 
   const sellerCities = await getSellerInfo(Array.from(sellerIds));

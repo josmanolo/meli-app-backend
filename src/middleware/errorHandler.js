@@ -1,22 +1,12 @@
-export const errorHandler = (error, req, res, next) => {
-    const { response, request, message, status } = error;
+export const errorHandler = (errorObject, req, res, next) => {
+    const { message, status, error } = errorObject;
 
     const errorResponse = {
         success: false,
-        message: "Internal server error",
-        status: 500,
+        message: message || "Internal server error",
+        status: status || 500,
+        error,
     };
-
-    if (response) {
-        errorResponse.status = response.status;
-        errorResponse.message = message;
-    } else if (request) {
-        errorResponse.status = 503;
-        errorResponse.message = "Connection Error";
-    } else if (status) {
-        errorResponse.status = status;
-        errorResponse.message = message || errorResponse.message;
-    }
 
     res.status(errorResponse.status).json(errorResponse);
 };

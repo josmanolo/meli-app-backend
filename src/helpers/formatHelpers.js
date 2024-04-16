@@ -33,7 +33,7 @@ const formatItem = (item, categoryIds, categoryCount, sellerCities) => {
 };
 
 const getMostFrequentCategoryId = (categoryCount) => {
-  if (categoryCount.length > 0) {
+  if (categoryCount) {
     return Object.keys(categoryCount).reduce((a, b) =>
       categoryCount[a] > categoryCount[b] ? a : b
     );
